@@ -1,0 +1,520 @@
+
+<h2 class="sr-only">Recall — daily vocabulary refresh for professionals</h2>
+<style>
+*{box-sizing:border-box;}
+.app{padding:1rem 0 3rem;font-family:var(--font-sans);}
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;}
+.app-name{font-size:20px;font-weight:500;color:var(--color-text-primary);letter-spacing:-.3px;}
+.app-tagline{font-size:12px;color:var(--color-text-secondary);margin-top:2px;}
+.streak-pill{display:flex;align-items:center;gap:5px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 12px;font-size:14px;font-weight:500;color:var(--color-text-primary);}
+.streak-pill .ti{color:#E8833A;font-size:17px;}
+.streak-sub{font-size:11px;font-weight:400;color:var(--color-text-secondary);}
+.nav{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.5rem;}
+.nb{flex:1;background:none;border:none;padding:10px 4px;font-size:13px;font-weight:400;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:color .15s;}
+.nb:hover{color:var(--color-text-primary);}
+.nb.on{color:var(--color-text-primary);font-weight:500;border-bottom-color:var(--color-text-primary);}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.card.featured{border-color:var(--color-border-secondary);}
+.card.dim{opacity:.6;}
+.wtop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;}
+.wname{font-size:24px;font-weight:500;color:var(--color-text-primary);letter-spacing:-.5px;}
+.wname.sm{font-size:17px;}
+.phonetic{font-size:12px;color:var(--color-text-secondary);margin-top:2px;font-style:italic;}
+.pos{font-size:11px;padding:2px 8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;color:var(--color-text-secondary);flex-shrink:0;}
+.upgrade-row{margin-bottom:.75rem;}
+.upgrade-lbl{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.chip{font-size:12px;padding:3px 9px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;color:var(--color-text-secondary);}
+.chip.strike{text-decoration:line-through;opacity:.6;}
+.defn{font-size:14px;color:var(--color-text-primary);line-height:1.6;margin-bottom:.75rem;}
+.exs{margin-bottom:.75rem;}
+.ex{font-size:13px;color:var(--color-text-secondary);line-height:1.6;padding:8px 10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border-left:2px solid var(--color-border-secondary);margin-bottom:6px;font-style:italic;}
+.tip{font-size:12px;color:var(--color-text-info);padding:8px 10px;background:var(--color-background-info);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-info);margin-bottom:1rem;line-height:1.5;}
+.tip .ti{margin-right:4px;vertical-align:-2px;}
+.rbtn{display:block;width:100%;padding:10px;background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;font-weight:500;color:var(--color-text-primary);cursor:pointer;transition:background .15s;}
+.rbtn:hover:not([disabled]){background:var(--color-background-secondary);}
+.rbtn.done{background:var(--color-background-success);border-color:var(--color-border-success);color:var(--color-text-success);cursor:default;}
+.rbtn.sm{font-size:12px;padding:7px;}
+.rbtn.prim{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary);}
+.rbtn.prim:hover:not([disabled]){opacity:.88;background:var(--color-text-primary);}
+.rbtn:disabled{opacity:.5;cursor:default;}
+.done-banner{background:var(--color-background-success);border:0.5px solid var(--color-border-success);border-radius:var(--border-radius-lg);padding:1.25rem;text-align:center;margin-bottom:1rem;}
+.done-icon{font-size:28px;color:var(--color-text-success);margin-bottom:.4rem;}
+.done-title{font-size:15px;font-weight:500;color:var(--color-text-success);}
+.done-sub{font-size:12px;color:var(--color-text-success);opacity:.8;margin-top:3px;}
+.slbl{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin:1.25rem 0 .75rem;text-transform:uppercase;letter-spacing:.5px;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.qcenter{text-align:center;padding:2rem 1rem;}
+.qicon{font-size:40px;color:var(--color-text-secondary);margin-bottom:1rem;}
+.qq{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:.75rem;}
+.qhint{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem;}
+.qprompt{font-size:18px;font-weight:500;color:var(--color-text-primary);line-height:1.4;}
+.pbar{height:3px;background:var(--color-background-secondary);border-radius:4px;margin-bottom:1.25rem;overflow:hidden;}
+.pfill{height:100%;background:var(--color-text-primary);border-radius:4px;transition:width .3s;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem;}
+.opt{padding:12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-primary);cursor:pointer;text-align:left;line-height:1.4;transition:background .1s;}
+.opt:hover:not([disabled]){background:var(--color-background-secondary);}
+.opt.right{background:var(--color-background-success)!important;border-color:var(--color-border-success)!important;color:var(--color-text-success)!important;}
+.opt.wrong{background:var(--color-background-danger)!important;border-color:var(--color-border-danger)!important;color:var(--color-text-danger)!important;}
+.opt[disabled]{cursor:default;}
+.score-box{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:2rem;text-align:center;margin-bottom:1rem;}
+.score-num{font-size:56px;font-weight:500;color:var(--color-text-primary);line-height:1;}
+.score-msg{font-size:14px;color:var(--color-text-secondary);margin-top:.5rem;}
+.srch{width:100%;padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:14px;margin-bottom:.75rem;background:var(--color-background-primary);color:var(--color-text-primary);}
+.catf{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.75rem;}
+.catb{font-size:12px;padding:4px 12px;background:none;border:0.5px solid var(--color-border-secondary);border-radius:20px;color:var(--color-text-secondary);cursor:pointer;transition:all .15s;}
+.catb.on{background:var(--color-text-primary);border-color:var(--color-text-primary);color:var(--color-background-primary);}
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.excard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;cursor:pointer;transition:border-color .15s;}
+.excard:hover{border-color:var(--color-border-secondary);}
+.excard.open{grid-column:1/-1;cursor:default;}
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.25rem;}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;text-align:center;}
+.stat-n{font-size:30px;font-weight:500;color:var(--color-text-primary);}
+.stat-l{font-size:11px;color:var(--color-text-secondary);margin-top:2px;}
+.wkrow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:1.5rem;}
+.dayc{height:42px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;color:var(--color-text-tertiary);}
+.dayc.act{background:var(--color-background-success);color:var(--color-text-success);}
+.dayc.tod{outline:1.5px solid var(--color-border-primary);}
+.qbox{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1.25rem;font-size:14px;color:var(--color-text-secondary);line-height:1.75;font-style:italic;}
+.refresh-bar{display:flex;align-items:center;justify-content:space-between;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:.75rem 1rem;margin-bottom:1rem;gap:12px;}
+.refresh-meta{font-size:12px;color:var(--color-text-secondary);line-height:1.5;}
+.refresh-meta strong{color:var(--color-text-primary);font-weight:500;display:block;margin-bottom:1px;}
+.refresh-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;font-weight:500;color:var(--color-text-primary);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s;}
+.refresh-btn:hover:not([disabled]){background:var(--color-background-primary);}
+.refresh-btn:disabled{opacity:.5;cursor:default;}
+.refresh-btn .ti{font-size:14px;}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1rem;text-align:center;gap:.75rem;}
+.spinner{width:26px;height:26px;border:2px solid var(--color-border-tertiary);border-top-color:var(--color-text-primary);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--color-text-primary);color:var(--color-background-primary);font-size:13px;padding:9px 18px;border-radius:var(--border-radius-md);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+</style>
+
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <div class="hdr">
+    <div>
+      <div class="app-name">Recall</div>
+      <div class="app-tagline" id="hdr-date"></div>
+    </div>
+    <div class="streak-pill">
+      <i class="ti ti-flame" aria-hidden="true"></i>
+      <span id="streak-n">0</span>
+      <span class="streak-sub">day streak</span>
+    </div>
+  </div>
+  <nav class="nav" role="tablist">
+    <button class="nb on" id="tb-today" onclick="go('today')" role="tab">Today</button>
+    <button class="nb" id="tb-quiz" onclick="go('quiz')" role="tab">Practice</button>
+    <button class="nb" id="tb-explore" onclick="go('explore')" role="tab">Words</button>
+    <button class="nb" id="tb-progress" onclick="go('progress')" role="tab">Progress</button>
+  </nav>
+  <div id="content"></div>
+</div>
+
+<script>
+let W = [
+{id:'stellar',w:'Stellar',ph:'STEL-er',pos:'adjective',cat:'general',alt:['very good','great','awesome'],def:'Exceptionally good; outstanding in performance or quality.',ex:['Your presentation was stellar — the room was completely engaged.','She did stellar work coordinating the launch under a tight deadline.'],tip:'Use in meetings or emails when praising someone\'s contribution. Carries far more weight than "great job."',syn:['exceptional','remarkable','superb']},
+{id:'articulate',w:'Articulate',ph:'ar-TIK-yoo-let',pos:'adjective',cat:'general',alt:['good at explaining','speaks clearly','easy to follow'],def:'Able to express thoughts and ideas clearly, fluently, and with precision.',ex:['She gave an articulate explanation of the policy changes.','He is one of the most articulate communicators I\'ve encountered in any boardroom.'],tip:'Use this to compliment how someone communicates — in a recommendation or after a strong presentation.',syn:['eloquent','fluent','expressive']},
+{id:'candid',w:'Candid',ph:'KAN-did',pos:'adjective',cat:'general',alt:['honest','direct','upfront'],def:'Truthful and straightforward, even when the truth is uncomfortable.',ex:['I\'ll be candid — I think the timeline is too aggressive.','She appreciated his candid feedback far more than vague reassurances.'],tip:'Use when you\'re about to say something honest but sensitive. It signals respect.',syn:['frank','forthright','transparent']},
+{id:'nuanced',w:'Nuanced',ph:'NOO-anst',pos:'adjective',cat:'general',alt:['complicated','layered','more to it'],def:'Marked by subtle distinctions; not reducible to a simple yes or no.',ex:['The situation is more nuanced than the email chain suggests.','Her nuanced understanding of the client\'s needs made her indispensable.'],tip:'Use when oversimplifying would be misleading. It signals depth of analysis.',syn:['subtle','layered','refined']},
+{id:'pivotal',w:'Pivotal',ph:'PIV-uh-tul',pos:'adjective',cat:'general',alt:['very important','key','make or break'],def:'Of crucial importance to the development or success of something.',ex:['This decision is pivotal — what we choose here shapes the next two years.','Her role was pivotal during the company\'s restructuring.'],tip:'Reserve this for genuine turning points. It loses power if used for everything.',syn:['critical','decisive','crucial']},
+{id:'succinct',w:'Succinct',ph:'suk-SINGKT',pos:'adjective',cat:'general',alt:['brief','short and clear','to the point'],def:'Briefly and clearly expressed; saying a great deal in very few words.',ex:['Keep the executive summary succinct — three sentences, no more.','Her succinct reply cut through three hours of back-and-forth.'],tip:'Use to compliment writing where someone packs a lot into very little.',syn:['concise','terse','pithy']},
+{id:'lucid',w:'Lucid',ph:'LOO-sid',pos:'adjective',cat:'general',alt:['clear','easy to follow','makes sense'],def:'Expressed with complete clarity; easy to understand even when complex.',ex:['His lucid breakdown of the architecture impressed the executive team.','After some rest, her thinking became far more lucid.'],tip:'Use to describe explanations or thinking that cuts through confusion.',syn:['clear','coherent','transparent']},
+{id:'ponder',w:'Ponder',ph:'PON-der',pos:'verb',cat:'general',alt:['think about','mull over','sit with it'],def:'To think deeply and carefully about something before forming a view.',ex:['I\'ve been pondering your proposal — can we discuss Thursday?','She paused to ponder the implications before responding.'],tip:'Use when you want to signal deliberate, unhurried thinking.',syn:['contemplate','deliberate','reflect']},
+{id:'leverage',w:'Leverage',ph:'LEV-er-ij',pos:'verb',cat:'workplace',alt:['use','take advantage of','make use of'],def:'To use something to maximum strategic advantage.',ex:['We can leverage the existing partnership to accelerate the timeline.','She leveraged her network to get the introductions the team needed.'],tip:'Signals strategic intent — using a resource smartly, not just passively.',syn:['utilize','harness','mobilize']},
+{id:'synthesize',w:'Synthesize',ph:'SIN-thuh-size',pos:'verb',cat:'workplace',alt:['combine','bring together','pull together'],def:'To combine information from multiple sources into a unified, coherent picture.',ex:['Can you synthesize the feedback from all three teams before Thursday?','She synthesized months of research into a clear two-page brief.'],tip:'Use when creating something new and coherent from multiple inputs.',syn:['consolidate','integrate','distill']},
+{id:'calibrate',w:'Calibrate',ph:'KAL-uh-brayt',pos:'verb',cat:'workplace',alt:['adjust','fine-tune','get right'],def:'To carefully adjust or align something based on precise feedback.',ex:['Let\'s calibrate our expectations before the stakeholder presentation.','We need to calibrate the messaging based on the audience\'s background.'],tip:'Use when precise, feedback-driven adjustment is involved.',syn:['adjust','align','refine']},
+{id:'advocate',w:'Advocate',ph:'AD-vuh-kayt',pos:'verb',cat:'workplace',alt:['support','push for','stand up for'],def:'To publicly and actively recommend or support a cause, policy, or person.',ex:['She advocated strongly for more flexible working arrangements.','I\'ll advocate for your proposal in the leadership meeting.'],tip:'Implies active, committed support — stronger than simply agreeing.',syn:['champion','promote','endorse']},
+{id:'facilitate',w:'Facilitate',ph:'fuh-SIL-uh-tayt',pos:'verb',cat:'workplace',alt:['run','help with','manage'],def:'To make a process or group discussion easier by actively guiding it forward.',ex:['She was asked to facilitate the cross-functional strategy session.','His role is to facilitate alignment, not to dictate the direction.'],tip:'Use when enabling others to move forward — clearing the path, not doing the work.',syn:['enable','coordinate','guide']},
+{id:'iterate',w:'Iterate',ph:'IT-er-ayt',pos:'verb',cat:'workplace',alt:['refine it','go back and adjust','tweak'],def:'To repeat and improve a process with each cycle.',ex:['Let\'s iterate on the design based on last week\'s feedback.','The best teams iterate quickly rather than waiting for perfection.'],tip:'Implies continuous improvement rather than one-time fixes.',syn:['refine','revisit','evolve']},
+{id:'pragmatic',w:'Pragmatic',ph:'prag-MAT-ik',pos:'adjective',cat:'workplace',alt:['practical','realistic','sensible'],def:'Dealing with things based on what\'s actually achievable, not just what\'s ideal.',ex:['We need a pragmatic approach — idealism won\'t get this across the line.','She\'s known for making pragmatic decisions under uncertain conditions.'],tip:'Use when emphasizing realistic problem-solving over theoretical ideals.',syn:['practical','realistic','sensible']},
+{id:'delegate',w:'Delegate',ph:'DEL-uh-gayt',pos:'verb',cat:'workplace',alt:['hand it off','assign','pass along'],def:'To entrust a task or responsibility to someone, along with the authority to carry it out.',ex:['Great leaders know when to delegate and when to stay hands-on.','She delegated the research phase while focusing on the pitch itself.'],tip:'Use when the handoff involves genuine trust and authority.',syn:['assign','entrust','empower']},
+{id:'empathize',w:'Empathize',ph:'EM-puh-thize',pos:'verb',cat:'personal',alt:['understand how they feel','relate to','feel for'],def:'To understand and genuinely share in the feelings of another person.',ex:['I can empathize with how overwhelming this transition must feel.','A good manager empathizes with their team without losing sight of the goal.'],tip:'Use when you want to signal deep emotional understanding.',syn:['relate','connect with','understand']},
+{id:'resilient',w:'Resilient',ph:'ri-ZIL-yunt',pos:'adjective',cat:'personal',alt:['strong','bouncing back','keeps going'],def:'Able to recover quickly from setbacks and adapt positively to difficulty.',ex:['She has been remarkably resilient through this past year of changes.','Building a resilient team means preparing for the unexpected.'],tip:'A powerful word for describing someone who has handled adversity with grace.',syn:['adaptable','tenacious','steadfast']},
+{id:'genuine',w:'Genuine',ph:'JEN-yoo-in',pos:'adjective',cat:'personal',alt:['real','sincere','from the heart'],def:'Truly what it appears to be — authentic, not performed or rehearsed.',ex:['Her concern for the team was genuine — they could all feel it.','A genuine apology changes the dynamic completely.'],tip:'Use when sincerity is the point — as opposed to performative behavior.',syn:['sincere','authentic','heartfelt']},
+{id:'deliberate',w:'Deliberate',ph:'dih-LIB-er-it',pos:'adjective',cat:'personal',alt:['on purpose','thought out','intentional'],def:'Done with full consciousness and intent; the opposite of accidental.',ex:['She made a deliberate choice to step back and reassess first.','The design was deliberate — every element served a purpose.'],tip:'Use when you want to emphasize something was carefully considered.',syn:['intentional','purposeful','considered']},
+{id:'cherish',w:'Cherish',ph:'CHER-ish',pos:'verb',cat:'personal',alt:['love','value deeply','hold onto'],def:'To hold something or someone dear; to protect and nurture with profound care.',ex:['I cherish the time we get together on weekends.','These early years with your kids — cherish every moment.'],tip:'Stronger and warmer than "love" — use in heartfelt moments with family.',syn:['treasure','hold dear','appreciate']},
+{id:'robust',w:'Robust',ph:'roh-BUST',pos:'adjective',cat:'tech',alt:['strong','reliable','doesn\'t break'],def:'Strong and effective under all conditions; able to withstand stress.',ex:['We need a more robust backup process before we scale.','The system performed robustly even under peak load.'],tip:'Use in technical discussions about systems that need to hold up under pressure.',syn:['solid','reliable','dependable']},
+{id:'scalable',w:'Scalable',ph:'SKAY-luh-bul',pos:'adjective',cat:'tech',alt:['can grow','will work at scale','flexible'],def:'Able to expand in capacity to handle increased demand without breaking.',ex:['Is this a scalable solution, or are we building into a corner?','The infrastructure is scalable — we can add capacity within hours.'],tip:'Use when evaluating whether a solution will hold up as needs grow.',syn:['expandable','adaptable','extensible']},
+{id:'streamline',w:'Streamline',ph:'STREAM-line',pos:'verb',cat:'tech',alt:['simplify','cut steps','make easier'],def:'To make a system more efficient by removing unnecessary steps.',ex:['Let\'s streamline the approval process — four sign-offs is too many.','The tool streamlined onboarding from two weeks to three days.'],tip:'Use when reducing complexity by design, not just trimming arbitrarily.',syn:['simplify','optimize','smooth out']},
+{id:'intuitive',w:'Intuitive',ph:'in-TOO-ih-tiv',pos:'adjective',cat:'tech',alt:['easy to use','natural','just clicks'],def:'Easy to understand without needing explicit instruction; naturally self-evident.',ex:['The new interface is far more intuitive — training time dropped by half.','Her intuitive grasp of the problem impressed the engineering team.'],tip:'Use to describe interfaces or thinking that feels naturally right.',syn:['natural','instinctive','self-evident']},
+{id:'holistic',w:'Holistic',ph:'hoh-LIS-tik',pos:'adjective',cat:'health',alt:['overall','the whole picture','considering everything'],def:'Treating something as a unified whole rather than isolated parts.',ex:['Her doctor took a holistic approach — looking at sleep, stress, and diet.','A holistic review includes culture and morale, not just numbers.'],tip:'Use when you\'re considering the full picture, not just isolated data points.',syn:['comprehensive','integrated','whole-person']},
+{id:'proactive',w:'Proactive',ph:'proh-AK-tiv',pos:'adjective',cat:'health',alt:['ahead of time','preventive','not waiting'],def:'Taking action to prevent problems before they occur, rather than reacting afterward.',ex:['Being proactive about mental health means not waiting until crisis.','She was proactive in scheduling check-ins before tensions escalated.'],tip:'Use when emphasizing prevention and initiative over reaction.',syn:['preventive','forward-thinking','anticipatory']},
+{id:'mitigate',w:'Mitigate',ph:'MIT-ih-gayt',pos:'verb',cat:'health',alt:['reduce','lessen','make less bad'],def:'To lessen the severity or impact of something.',ex:['Regular movement can mitigate the effects of prolonged screen time.','We took steps to mitigate the risks before the rollout.'],tip:'Use when taking steps to reduce impact — implies intentional intervention.',syn:['reduce','alleviate','minimize']},
+{id:'discerning',w:'Discerning',ph:'dis-SERN-ing',pos:'adjective',cat:'lifestyle',alt:['picky','selective','has good taste'],def:'Showing good judgment; selective in a way that reflects high standards.',ex:['She\'s a discerning reader — she won\'t finish a book just because she started.','The restaurant attracts a discerning clientele who value quality.'],tip:'A sophisticated way to describe selectiveness — frame it as a compliment.',syn:['selective','perceptive','tasteful']},
+{id:'curate',w:'Curate',ph:'KYOO-rayt',pos:'verb',cat:'lifestyle',alt:['choose carefully','pick','put together'],def:'To carefully select and organize with knowledge and expert judgment.',ex:['She curates her reading list the way a museum curator selects pieces.','I\'ve been curating a morning routine that actually works.'],tip:'Use when the selection is thoughtful and purposeful — not just picking.',syn:['handpick','select','assemble']},
+{id:'savor',w:'Savor',ph:'SAY-ver',pos:'verb',cat:'lifestyle',alt:['enjoy slowly','appreciate','not rush through'],def:'To enjoy something fully and unhurriedly, especially when fleeting.',ex:['Savor these early years with your kids — they move faster than you expect.','He savored the quiet Sunday morning before the week began.'],tip:'Use when encouraging presence and slow enjoyment. Beautiful in family contexts.',syn:['relish','treasure','appreciate']}
+];
+
+const CATS=[{id:'all',l:'All'},{id:'general',l:'General'},{id:'workplace',l:'Workplace'},{id:'personal',l:'Personal'},{id:'tech',l:'Tech'},{id:'health',l:'Health'},{id:'lifestyle',l:'Lifestyle'}];
+const QUOTES=['\"The limits of my language are the limits of my world.\" — Wittgenstein','\"Language is the road map of a culture.\" — Rita Mae Brown','Every word you recall is a neural pathway strengthened.','Small daily practice compounds into remarkable fluency.','\"You are never too old to set another goal.\" — C.S. Lewis','Words are the currency of thought. The richer your vocabulary, the richer your thinking.'];
+
+const st={tab:'today',streak:0,lastCompleted:'',reviewedToday:new Set(),reviewHistory:[],qPhase:'start',qQs:[],qIdx:0,qScore:0,qAnswered:false,qSelected:-1,eCat:'all',eSearch:'',eOpen:null,refreshing:false};
+
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function yest(){const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);}
+
+function seededShuffle(arr,seed){
+  const r=[...arr];let s=seed;
+  for(let i=r.length-1;i>0;i--){s=(s*16807+0)%2147483647;const j=s%(i+1);[r[i],r[j]]=[r[j],r[i]];}
+  return r;
+}
+
+function dailyWords(){
+  const dayN=Math.floor(Date.now()/86400000);
+  return seededShuffle(W,dayN).slice(0,3);
+}
+
+async function loadSt(){
+  try{
+    const r=await window.storage.get('recall-v4');
+    if(r){
+      const s=JSON.parse(r.value);
+      if(Array.isArray(s.words)&&s.words.length>0) W=s.words;
+      const today=todayStr();
+      if(s.lastCompleted===today){st.streak=s.streak||0;st.reviewedToday=new Set(s.reviewedToday||[]);}
+      else if(s.lastCompleted===yest()){st.streak=s.streak||0;st.reviewedToday=new Set();}
+      else{st.streak=0;st.reviewedToday=new Set();}
+      st.lastCompleted=s.lastCompleted||'';
+      st.reviewHistory=s.reviewHistory||[];
+    }
+  }catch(e){}
+}
+
+async function saveSt(){
+  try{
+    await window.storage.set('recall-v4',JSON.stringify({
+      words:W,streak:st.streak,lastCompleted:st.lastCompleted,
+      reviewedToday:[...st.reviewedToday],reviewHistory:st.reviewHistory
+    }));
+  }catch(e){}
+}
+
+function h(s){
+  if(typeof s!=='string')s=String(s||'');
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg,dur=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+function updateHdr(){
+  const now=new Date();
+  document.getElementById('hdr-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('streak-n').textContent=st.streak;
+}
+
+async function refreshWords(){
+  if(st.refreshing)return;
+  st.refreshing=true;
+  renderContent();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4000,
+        messages:[{role:'user',content:`Generate exactly 30 sophisticated vocabulary words for educated professionals aged 40+ experiencing word-finding difficulty. These are high-achievers who want to recall sharper words instead of defaulting to plain ones.
+
+Return ONLY a valid JSON array with no explanation, markdown, or code fences.
+
+Each object must have exactly these fields:
+- id: lowercase unique string, no spaces or special characters
+- w: the word (capitalized)
+- ph: phonetic pronunciation e.g. "STEL-er"
+- pos: part of speech — one of: adjective, verb, noun
+- cat: one of: general, workplace, personal, tech, health, lifestyle
+- alt: array of 2-3 plain everyday phrases this word replaces e.g. ["very good","great"]
+- def: one clear concise sentence definition
+- ex: array of exactly 2 realistic example sentences in professional or personal contexts
+- tip: one specific usage tip — when and where to use this word
+- syn: array of exactly 3 synonyms
+
+Distribute evenly: ~5 per category. Make words varied, sophisticated but natural. Do NOT repeat any of these words: stellar, articulate, candid, nuanced, pivotal, succinct, lucid, ponder, leverage, synthesize, calibrate, advocate, facilitate, iterate, pragmatic, delegate, empathize, resilient, genuine, deliberate, cherish, robust, scalable, streamline, intuitive, holistic, proactive, mitigate, discerning, curate, savor.`}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content[0].text.trim().replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(raw);
+    if(Array.isArray(parsed)&&parsed.length>=10){
+      W=parsed;
+      st.reviewedToday=new Set();
+      st.eOpen=null;
+      await saveSt();
+      showToast(`${W.length} new words loaded`);
+    } else {
+      showToast('Refresh failed — keeping current words');
+    }
+  }catch(e){
+    showToast('Refresh failed — keeping current words');
+  }
+  st.refreshing=false;
+  renderContent();
+}
+
+function refreshBar(){
+  return `<div class="refresh-bar">
+    <div class="refresh-meta">
+      <strong>${W.length} words in your bank</strong>
+      Tap refresh to load a fresh AI-curated set
+    </div>
+    <button class="refresh-btn" onclick="refreshWords()" ${st.refreshing?'disabled':''} aria-label="Refresh word list with AI">
+      <i class="ti ti-${st.refreshing?'loader':'sparkles'}" aria-hidden="true" style="${st.refreshing?'animation:spin .7s linear infinite;':''}"></i>
+      ${st.refreshing?'Refreshing…':'Refresh with AI'}
+    </button>
+  </div>`;
+}
+
+function bigCard(w){
+  const done=st.reviewedToday.has(w.id);
+  return `<div class="card featured${done?' dim':''}">
+    <div class="wtop">
+      <div><div class="wname">${h(w.w)}</div><div class="phonetic">${h(w.ph)}</div></div>
+      <span class="pos">${h(w.pos)}</span>
+    </div>
+    <div class="upgrade-row">
+      <div class="upgrade-lbl">Say this instead of</div>
+      <div class="chips">
+        ${w.alt.map(a=>`<span class="chip strike">${h(a)}</span>`).join('')}
+        <span style="font-size:12px;color:var(--color-text-tertiary);align-self:center;">→ try <strong>${h(w.w)}</strong></span>
+      </div>
+    </div>
+    <div class="defn">${h(w.def)}</div>
+    <div class="exs">${w.ex.map(e=>`<div class="ex">"${h(e)}"</div>`).join('')}</div>
+    <div class="tip"><i class="ti ti-bulb" aria-hidden="true"></i> ${h(w.tip)}</div>
+    <button class="rbtn${done?' done':''}" onclick="markReviewed('${h(w.id)}')" ${done?'disabled':''}>
+      ${done?'<i class="ti ti-check" aria-hidden="true"></i> Reviewed':'Mark as reviewed'}
+    </button>
+  </div>`;
+}
+
+function smallCard(w){
+  const done=st.reviewedToday.has(w.id);
+  return `<div class="card${done?' dim':''}">
+    <div class="wtop" style="margin-bottom:.5rem;">
+      <div class="wname sm">${h(w.w)}</div>
+      <span class="pos">${h(w.pos)}</span>
+    </div>
+    <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:8px;">${h(w.def)}</div>
+    <div class="chips" style="margin-bottom:10px;">${w.alt.slice(0,2).map(a=>`<span class="chip strike" style="font-size:11px;">${h(a)}</span>`).join('')}</div>
+    <button class="rbtn sm${done?' done':''}" onclick="markReviewed('${h(w.id)}')" ${done?'disabled':''}>
+      ${done?'<i class="ti ti-check" aria-hidden="true"></i> Done':'Review'}
+    </button>
+  </div>`;
+}
+
+function renderToday(){
+  if(st.refreshing){
+    return `${refreshBar()}<div class="loading-screen">
+      <div class="spinner"></div>
+      <div style="font-size:15px;font-weight:500;color:var(--color-text-primary);">Curating a fresh word list…</div>
+      <div style="font-size:12px;color:var(--color-text-tertiary);">This takes about 10 seconds</div>
+    </div>`;
+  }
+  const dw=dailyWords();
+  const allDone=dw.every(w=>st.reviewedToday.has(w.id));
+  let html=refreshBar();
+  if(allDone){
+    html+=`<div class="done-banner">
+      <div class="done-icon"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+      <div class="done-title">Today's words reviewed</div>
+      <div class="done-sub">Come back tomorrow for 3 new ones. You're building a great habit.</div>
+    </div>`;
+  }
+  html+=bigCard(dw[0]);
+  html+=`<div class="slbl">Also today</div><div class="two">${smallCard(dw[1])}${smallCard(dw[2])}</div>`;
+  html+=`<div style="margin-top:1.25rem;padding:1rem;background:var(--color-background-secondary);border-radius:var(--border-radius-lg);">
+    <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem;">Synonyms to know</div>
+    <div class="chips">${[...dw[0].syn,...dw[1].syn,...dw[2].syn].map(s=>`<span class="chip">${h(s)}</span>`).join('')}</div>
+  </div>`;
+  return html;
+}
+
+async function markReviewed(id){
+  if(st.reviewedToday.has(id))return;
+  st.reviewedToday.add(id);
+  const dw=dailyWords();
+  if(dw.every(w=>st.reviewedToday.has(w.id))){
+    const today=todayStr();
+    if(st.lastCompleted!==today){
+      st.streak=st.lastCompleted===yest()?st.streak+1:1;
+      st.lastCompleted=today;
+      st.reviewHistory=[...st.reviewHistory,{date:today,count:3}].slice(-30);
+    }
+  }
+  updateHdr();await saveSt();renderContent();
+}
+
+function genQs(){
+  const sh=seededShuffle(W,Date.now()).slice(0,8);
+  return sh.map((w,i)=>{
+    const mode=i%2===0?'def':'upgrade';
+    const others=W.filter(x=>x.id!==w.id).sort(()=>Math.random()-.5);
+    let prompt,hint,opts,ci;
+    if(mode==='def'){
+      prompt=w.w;hint='What does this word mean?';
+      const correct=w.def;
+      opts=[correct,...others.slice(0,3).map(x=>x.def)].sort(()=>Math.random()-.5);
+      ci=opts.indexOf(correct);
+    }else{
+      prompt=`Instead of saying "${w.alt[0]}"`;hint='Which word is the stronger choice?';
+      const correct=w.w;
+      opts=[correct,...others.slice(0,3).map(x=>x.w)].sort(()=>Math.random()-.5);
+      ci=opts.indexOf(correct);
+    }
+    return{prompt,hint,opts,ci};
+  });
+}
+
+function renderQuiz(){
+  if(st.qPhase==='start'){
+    return `<div class="qcenter">
+      <div class="qicon"><i class="ti ti-brain" aria-hidden="true"></i></div>
+      <div style="font-size:18px;font-weight:500;margin-bottom:.5rem;">Ready to practice?</div>
+      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:1.5rem;line-height:1.6;">8 quick questions — match words to meanings or find the sharper word for a common phrase.</div>
+      <button class="rbtn prim" style="max-width:200px;margin:0 auto;" onclick="startQ()">Start practice</button>
+    </div>`;
+  }
+  if(st.qPhase==='done'){
+    const pct=Math.round((st.qScore/st.qQs.length)*100);
+    const msg=pct>=88?'Outstanding recall.':pct>=65?'Solid effort — keep going.':'Good start — it gets easier.';
+    return `<div class="score-box">
+      <div class="score-num">${st.qScore}<span style="font-size:28px;color:var(--color-text-secondary);">/${st.qQs.length}</span></div>
+      <div style="font-size:22px;font-weight:500;margin:.25rem 0;">${pct}%</div>
+      <div class="score-msg">${h(msg)}</div>
+    </div>
+    <button class="rbtn prim" style="margin-bottom:.75rem;" onclick="startQ()">Try again</button>
+    <button class="rbtn" onclick="go('today')">Back to today's words</button>`;
+  }
+  const q=st.qQs[st.qIdx];
+  const pct=Math.round((st.qIdx/st.qQs.length)*100);
+  return `<div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+      <span style="font-size:12px;color:var(--color-text-secondary);">${st.qIdx+1} of ${st.qQs.length}</span>
+      <span style="font-size:13px;font-weight:500;">Score: ${st.qScore}</span>
+    </div>
+    <div class="pbar"><div class="pfill" style="width:${pct}%"></div></div>
+    <div class="qq"><div class="qhint">${h(q.hint)}</div><div class="qprompt">${h(q.prompt)}</div></div>
+    <div class="opts">
+      ${q.opts.map((o,i)=>{
+        let cls='opt';
+        if(st.qAnswered){if(i===q.ci)cls+=' right';else if(i===st.qSelected)cls+=' wrong';}
+        return `<button class="${cls}" onclick="answerQ(${i})" ${st.qAnswered?'disabled':''}>${h(o)}</button>`;
+      }).join('')}
+    </div>
+    ${st.qAnswered?`<button class="rbtn" onclick="nextQ()">${st.qIdx<st.qQs.length-1?'Next question':'See results'}</button>`:''}
+  </div>`;
+}
+
+function startQ(){st.qPhase='question';st.qQs=genQs();st.qIdx=0;st.qScore=0;st.qAnswered=false;st.qSelected=-1;renderContent();}
+function answerQ(i){if(st.qAnswered)return;st.qAnswered=true;st.qSelected=i;if(i===st.qQs[st.qIdx].ci)st.qScore++;renderContent();}
+function nextQ(){st.qIdx++;if(st.qIdx>=st.qQs.length)st.qPhase='done';st.qAnswered=false;st.qSelected=-1;renderContent();}
+
+function renderExplore(){
+  if(st.refreshing)return`<div class="loading-screen"><div class="spinner"></div><div style="font-size:14px;color:var(--color-text-secondary);">Refreshing words…</div></div>`;
+  const fl=W.filter(w=>{
+    const cok=st.eCat==='all'||w.cat===st.eCat;
+    const q=st.eSearch.toLowerCase();
+    const sok=!q||w.w.toLowerCase().includes(q)||w.def.toLowerCase().includes(q)||w.alt.some(a=>a.includes(q));
+    return cok&&sok;
+  });
+  return `<div>
+    <input class="srch" type="text" placeholder="Search words, meanings, or phrases…" value="${h(st.eSearch)}" oninput="eSrch(this.value)"/>
+    <div class="catf">${CATS.map(c=>`<button class="catb${st.eCat===c.id?' on':''}" onclick="eCat('${c.id}')">${c.l}</button>`).join('')}</div>
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:.75rem;">${fl.length} word${fl.length!==1?'s':''}</div>
+    <div class="wgrid">
+      ${fl.map(w=>{
+        if(st.eOpen===w.id){
+          return `<div class="excard open">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;">
+              <div><div class="wname" style="font-size:20px;">${h(w.w)}</div><div class="phonetic">${h(w.ph)}</div></div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span class="pos">${h(w.pos)}</span>
+                <button onclick="eOpen(null)" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--color-text-secondary);padding:0;" aria-label="Close"><i class="ti ti-x"></i></button>
+              </div>
+            </div>
+            <div class="upgrade-row"><div class="upgrade-lbl">Instead of saying</div><div class="chips">${w.alt.map(a=>`<span class="chip strike">${h(a)}</span>`).join('')}</div></div>
+            <div class="defn">${h(w.def)}</div>
+            <div class="exs">${w.ex.map(e=>`<div class="ex">"${h(e)}"</div>`).join('')}</div>
+            <div class="tip"><i class="ti ti-bulb" aria-hidden="true"></i> ${h(w.tip)}</div>
+          </div>`;
+        }
+        return `<div class="excard" onclick="eOpen('${w.id}')">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px;">
+            <div class="wname" style="font-size:15px;">${h(w.w)}</div>
+            <span class="pos" style="font-size:10px;">${h(w.pos)}</span>
+          </div>
+          <div class="clamp" style="font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:7px;">${h(w.def)}</div>
+          <div class="chips">${w.alt.slice(0,1).map(a=>`<span class="chip strike" style="font-size:11px;">${h(a)}</span>`).join('')}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function eCat(c){st.eCat=c;st.eOpen=null;renderContent();}
+function eSrch(q){st.eSearch=q;st.eOpen=null;renderContent();}
+function eOpen(id){st.eOpen=id;renderContent();}
+
+function renderProgress(){
+  const todayCount=st.reviewedToday.size;
+  const weekCount=st.reviewHistory.slice(-7).reduce((a,r)=>a+(r.count||0),0)+todayCount;
+  const totalAll=st.reviewHistory.reduce((a,r)=>a+(r.count||0),0)+todayCount;
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    const isT=i===0;
+    const act=isT?todayCount>0:st.reviewHistory.some(r=>r.date===ds);
+    days.push({l:d.toLocaleDateString('en-US',{weekday:'short'}).slice(0,1),isT,act});
+  }
+  const qidx=Math.floor(Date.now()/86400000)%QUOTES.length;
+  const smsg=st.streak===0?'Start today — your streak begins with the first word.':st.streak<7?`${st.streak} days in. You're forming the habit.`:st.streak<14?`${st.streak} days straight. This is becoming part of who you are.`:`${st.streak} days. Remarkable.`;
+  return `<div>
+    <div class="sgrid">
+      <div class="stat"><div class="stat-n">${st.streak}</div><div class="stat-l">Day streak</div></div>
+      <div class="stat"><div class="stat-n">${todayCount}</div><div class="stat-l">Today</div></div>
+      <div class="stat"><div class="stat-n">${weekCount}</div><div class="stat-l">This week</div></div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:1.25rem;">
+      <div style="font-size:13px;color:var(--color-text-secondary);">${h(smsg)}</div>
+    </div>
+    <div class="slbl">Last 7 days</div>
+    <div class="wkrow">
+      ${days.map(d=>`<div class="dayc${d.act?' act':''}${d.isT?' tod':''}">
+        <span>${d.l}</span>${d.act?'<i class="ti ti-check" style="font-size:11px;" aria-hidden="true"></i>':'<span style="opacity:.3;">·</span>'}
+      </div>`).join('')}
+    </div>
+    <div class="slbl">Word bank</div>
+    <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:1.25rem;">${W.length} words · <span style="color:var(--color-text-primary);font-weight:500;">${totalAll} reviewed total</span></div>
+    <div class="qbox">${h(QUOTES[qidx])}</div>
+  </div>`;
+}
+
+function go(tab){
+  st.tab=tab;
+  if(tab==='quiz')st.qPhase='start';
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tb-'+tab).classList.add('on');
+  renderContent();
+}
+
+function renderContent(){
+  let html='';
+  if(st.tab==='today')html=renderToday();
+  else if(st.tab==='quiz')html=renderQuiz();
+  else if(st.tab==='explore')html=renderExplore();
+  else if(st.tab==='progress')html=renderProgress();
+  document.getElementById('content').innerHTML=html;
+}
+
+loadSt().then(()=>{updateHdr();renderContent();});
+</script>
